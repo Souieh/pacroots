@@ -1,0 +1,344 @@
+<!doctype html><meta charset="utf-8" /><title>pacroots</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  /* pacroots: pure CSS, no external assets. Paste inside the <style> tag of template.html. */
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f8fa;
+    --panel: #fff;
+    --fg: #1f2328;
+    --muted: #6a737d;
+    --line: #d0d7de;
+    --accent: #0b7bbf;
+    --accent-soft: #0b7bbf1a;
+    --bar: #0b7bbf24;
+    --warn: #9a6700;
+    --warn-soft: #9a67001f;
+    --mono:
+      ui-monospace, "JetBrains Mono", "Fira Code", "Cascadia Code", Menlo,
+      Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --fg: #e6edf3;
+      --muted: #8b949e;
+      --line: #30363d;
+      --accent: #1793d1;
+      --accent-soft: #1793d126;
+      --bar: #1793d130;
+      --warn: #e3b341;
+      --warn-soft: #e3b34124;
+    }
+  }
+
+  * {
+    scrollbar-color: var(--line) transparent;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+
+  body {
+    font: 14px/1.45 var(--sans);
+    color: var(--fg);
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 4rem;
+    background: radial-gradient(
+        900px 320px at 8% -8%,
+        var(--accent-soft),
+        transparent
+      )
+      no-repeat fixed var(--bg);
+  }
+
+  /* header */
+  h2 {
+    margin: 0.2rem 0 0;
+    font: 700 1.7rem var(--mono);
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--accent), #6ee7d8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h2::before {
+    content: "$ ";
+    opacity: 0.55;
+  }
+  h2::after {
+    content: "_";
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    h2::after {
+      animation: blink 1.1s steps(1) infinite;
+    }
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+  }
+  #sum {
+    color: var(--muted);
+    font: 0.8rem var(--mono);
+    margin-top: 0.1rem;
+  }
+
+  /* search */
+  #q {
+    position: sticky;
+    top: 0.6rem;
+    z-index: 5;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0.9rem 0;
+    padding: 0.65rem 0.9rem 0.65rem 2.4rem;
+    font: inherit;
+    color: var(--fg);
+    background: var(--panel)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E")
+      no-repeat 0.8rem 50%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    outline: none;
+    box-shadow: 0 4px 16px #0003;
+  }
+  #q:focus {
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 3px var(--accent-soft),
+      0 4px 16px #0003;
+  }
+
+  /* tree panel */
+  #out {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.3rem;
+  }
+
+  summary {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+    padding: 0.35rem 0.6rem 0.35rem 1.6rem;
+    border-radius: 6px;
+    background-image: linear-gradient(
+      90deg,
+      var(--bar) var(--p, 0%),
+      transparent var(--p, 0%)
+    );
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    background-color: var(--accent-soft);
+  }
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  summary br {
+    display: none;
+  }
+
+  /* chevron */
+  summary::before {
+    content: "";
+    position: absolute;
+    left: 0.6rem;
+    top: 0.75rem;
+    width: 0.38rem;
+    height: 0.38rem;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(-45deg);
+  }
+  details[open] > summary::before {
+    transform: rotate(45deg);
+    top: 0.65rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    summary::before {
+      transition: transform 0.15s;
+    }
+  }
+
+  /* leaf: no children, so a dot instead of a chevron */
+  summary.leaf {
+    cursor: default;
+  }
+  summary.leaf::before {
+    width: 0.28rem;
+    height: 0.28rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--line);
+    transform: none;
+    left: 0.7rem;
+    top: 0.95rem;
+  }
+
+  summary b {
+    font: 600 0.95em var(--mono);
+  }
+  .s {
+    float: right;
+    margin-left: 1rem;
+    color: var(--muted);
+    font: 0.85em var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .d {
+    display: block;
+    margin-top: 0.05rem;
+    color: var(--muted);
+    font-size: 0.85em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* nesting: indent guide */
+  .o {
+    margin-left: 1.1rem;
+    padding-left: 0.35rem;
+    border-left: 1px solid var(--line);
+  }
+
+  /* badges: <i class=sh> shared, <i class=t> explicit */
+  .sh,
+  i.t {
+    display: inline-block;
+    margin-left: 0.45rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 99px;
+    font: 600 0.66rem/1 var(--sans);
+    font-style: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: 0.12em;
+  }
+  .sh {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  i.t {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  /* orphans */
+  h3 {
+    margin: 1.2rem 0.6rem 0.3rem;
+    font: 600 0.72rem var(--sans);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #out > div {
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+  }
+  #out > div:hover {
+    background: var(--accent-soft);
+  }
+
+  @media (max-width: 560px) {
+    body {
+      padding: 0.75rem 0.5rem 3rem;
+    }
+    .s {
+      float: none;
+      display: block;
+      margin: 0;
+    }
+  }
+</style>
+<h2>pacroots</h2>
+<div id="sum" class="t"></div>
+<input id="q" placeholder="search name or description..." autofocus />
+<div id="out"></div>
+<script>
+  const D = __DATA__;
+  const H = (n) => {
+    for (const u of ["B", "KiB", "MiB", "GiB"]) {
+      if (n < 1024 || u == "GiB")
+        return (u == "B" ? n : n.toFixed(1)) + " " + u;
+      n /= 1024;
+    }
+  };
+  const E = (s) =>
+    s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  const G = D.graph,
+    R = document.getElementById("out");
+  const tag = (g, top) =>
+    top
+      ? ""
+      : g.root
+        ? " <i class=t>explicit</i>"
+        : g.by > 1
+          ? ` <i class=sh>shared ×${g.by}</i>`
+          : "";
+  function mk(n, path, extra) {
+    const g = G[n],
+      d = document.createElement("details"),
+      cyc = path.includes(n),
+      kids = cyc ? [] : g.deps.slice().sort((a, b) => G[b].size - G[a].size);
+    d.innerHTML = `<summary${kids.length ? "" : " class=leaf"}><b>${E(n)}</b>${tag(g, !path.length)}${cyc ? " ↻" : ""}<span class=s>${extra || H(g.size)}</span><br><span class=d>${E(g.desc)}</span></summary>`;
+    if (kids.length)
+      d.addEventListener("toggle", () => {
+        if (d.open && !d.dataset.f) {
+          d.dataset.f = 1;
+          const b = document.createElement("div");
+          b.className = "o";
+          kids.forEach((k) => b.append(mk(k, path.concat(n))));
+          d.append(b);
+        }
+      });
+    return d;
+  }
+  function draw() {
+    const q = document.getElementById("q").value.toLowerCase();
+    R.textContent = "";
+    let n = 0;
+    for (const r of D.roots) {
+      const hay = (
+        r.name +
+        " " +
+        r.desc +
+        " " +
+        r.owned
+          .map((o) => o.name)
+          .concat(r.shared)
+          .join(" ")
+      ).toLowerCase();
+      if (q && !hay.includes(q)) continue;
+      n++;
+      const d = mk(r.name, [], `frees ${H(r.excl)} · ${r.owned.length} owned`);
+      if (q) d.open = true;
+      R.append(d);
+    }
+    if (!q && D.orphans.length) {
+      const h = document.createElement("h3");
+      h.textContent = "Orphans (nothing needs them)";
+      R.append(h);
+      D.orphans.forEach((o) => {
+        const d = document.createElement("div");
+        d.innerHTML = `${E(o.name)} <span class=s>${H(o.size)}</span><br><span class=d>${E(o.desc)}</span>`;
+        R.append(d);
+      });
+    }
+    document.getElementById("sum").textContent =
+      `${D.total} packages · ${D.roots.length} explicit roots · ${n} shown · ${D.orphans.length} orphans`;
+  }
+  document.getElementById("q").oninput = draw;
+  draw();
+</script>
