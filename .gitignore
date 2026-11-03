@@ -25,3 +25,8 @@ roots.json
 
 # Local env
 .env
+
+src/
+pkg/
+*.pkg.tar.zst
+*.tar.gz
