@@ -8,7 +8,7 @@ url="https://github.com/souieh/pacroots"
 license=('MIT')
 depends=('python' 'pacman')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')   # run `updpkgsums` to fill in the real one
+sha256sums=('8a819764b47b9eccf1907138ea30dc3899e7cd89558291ce7a183fcd914d171f')
 
 package() {
   cd "$pkgname-$pkgver"
